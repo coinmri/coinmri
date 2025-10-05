@@ -9,11 +9,11 @@ import { Footer } from "@/components/Footer"
 import { MetaMaskAuth } from "@/components/MetaMaskAuth"
 import { AdminPanel } from "@/components/AdminPanel"
 import { Card, CardContent } from "@/components/ui/card"
-import { Wallet, LineChart, Coins, ExternalLinkIcon } from "lucide-react"
+import { Wallet, LineChart } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import Link from "next/link"
-import { Button } from "@/components/ui/button"
+import { ExternalLink } from "@/components/ui/external-link"
 
 interface ArbitrageOpportunity {
   coin: string
@@ -101,37 +101,8 @@ export default function Home() {
         {/* Show Admin Panel if connected wallet is admin */}
         {isAdmin && connectedAddress && <AdminPanel walletAddress={connectedAddress} />}
 
-        {/* Utility Coin Announcement */}
-        <div className="mb-8">
-          <Card className="bg-gradient-to-r from-amber-950/70 to-orange-950/70 border-amber-800/50 backdrop-blur-sm">
-            <CardContent className="flex flex-col md:flex-row items-center justify-between py-6 px-6">
-              <div className="flex items-center gap-4 mb-4 md:mb-0">
-                <Coins className="h-12 w-12 text-amber-400 flex-shrink-0" />
-                <div>
-                  <h3 className="text-xl font-bold text-amber-400 mb-1">Utility Token Available on Arbitrum</h3>
-                  <p className="text-gray-300 text-sm">
-                    Buy our utility token now on Uniswap - Integration for premium features coming soon!
-                  </p>
-                </div>
-              </div>
-              <a
-                href="https://app.uniswap.org/explore/tokens/arbitrum/0x7e57271bc2d77bd7cfb8adc0eebff63adf7d7207"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex-shrink-0"
-              >
-                <Button className="bg-amber-700 hover:bg-amber-600 text-white px-6 py-2 flex items-center gap-2">
-                  Buy on Uniswap
-                  <ExternalLinkIcon className="h-4 w-4" />
-                </Button>
-              </a>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Tabs at the top */}
         <Tabs defaultValue="search" className="mb-8" onValueChange={setActiveTab}>
-          <TabsList className="grid grid-cols-2 max-w-[400px] mb-4 bg-gray-800/50 mx-auto">
+          <TabsList className="grid grid-cols-2 max-w-[400px] mb-4 bg-gray-800/50">
             <TabsTrigger value="search" className="data-[state=active]:bg-purple-500">
               Free Quick Search
             </TabsTrigger>
@@ -171,7 +142,7 @@ export default function Home() {
                               className="flex items-center gap-2 text-purple-400 hover:text-purple-300 font-medium"
                             >
                               {row.coin}
-                              <ExternalLinkIcon className="h-4 w-4" />
+                              <ExternalLink className="h-4 w-4" />
                             </Link>
                           </TableCell>
                           <TableCell className="text-right">{formatPrice(row.minPrice)}</TableCell>
@@ -192,9 +163,7 @@ export default function Home() {
           </TabsContent>
         </Tabs>
 
-        {/* Side by side cards */}
         <div className="grid md:grid-cols-2 gap-8 mb-8">
-          {/* Connect Your Wallet Card */}
           <Card className="bg-blue-900/20 border-blue-800/50">
             <CardContent className="flex flex-col items-center justify-center py-12 text-center">
               <Wallet className="h-16 w-16 text-blue-400 mb-4" />
@@ -217,7 +186,6 @@ export default function Home() {
             </CardContent>
           </Card>
 
-          {/* Professional Crypto Analysis */}
           <Card className="bg-purple-900/20 border-purple-800/50">
             <CardContent className="flex flex-col items-center justify-center py-12 text-center">
               <LineChart className="h-16 w-16 text-purple-400 mb-4" />
@@ -225,9 +193,9 @@ export default function Home() {
               <p className="text-gray-300 max-w-md mb-6">
                 Get instant insights and expert manual review within hours. Powered by advanced AI.
               </p>
-              <div className="grid grid-cols-1 gap-6 text-left w-full">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left w-full">
                 <div className="space-y-3">
-                  <h3 className="text-purple-400 font-semibold text-center">Instant Analysis</h3>
+                  <h3 className="text-purple-400 font-semibold">Instant Analysis</h3>
                   <ul className="text-gray-300 space-y-2">
                     <li className="flex items-center">
                       <span className="text-purple-400 mr-2">•</span> Price status vs historical data
@@ -238,7 +206,7 @@ export default function Home() {
                   </ul>
                 </div>
                 <div className="space-y-3">
-                  <h3 className="text-purple-400 font-semibold text-center">Expert Review</h3>
+                  <h3 className="text-purple-400 font-semibold">Expert Review</h3>
                   <ul className="text-gray-300 space-y-2">
                     <li className="flex items-center">
                       <span className="text-purple-400 mr-2">•</span> Whitepaper deep dive

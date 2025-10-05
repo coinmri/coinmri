@@ -7,7 +7,6 @@ import { Loader2, LogOut, AlertTriangle } from "lucide-react"
 import { getTransactionsBetweenAddresses } from "@/lib/arbiscanService"
 import { decodeDashboardAccess } from "@/lib/transactionUtils"
 import { useRouter, usePathname } from "next/navigation"
-import { checkForAnalysisRequests } from "@/app/actions/arbiscan-actions"
 
 // Arbitrum network configuration
 const ARBITRUM_CHAIN_ID = "0xa4b1" // 42161 in hex
@@ -25,6 +24,10 @@ const ARBITRUM_NETWORK = {
 
 // Admin wallet address
 const ADMIN_WALLET_ADDRESS = "0x837f5E0FbabD0b1c3482B6Ad10fA39275bDA252e"
+
+// Arbiscan API configuration
+const ARBISCAN_API_KEY = process.env.NEXT_PUBLIC_ARBISCAN_API_KEY || "Q7F6Q2ITCZJWT98X4FFXJ1RQ9NRWGZWXWK"
+const ARBISCAN_API_URL = "https://api.arbiscan.io/api"
 
 // Function to check if the current network is Arbitrum
 async function isArbitrumNetwork(): Promise<boolean> {
@@ -137,6 +140,52 @@ async function checkForDashboardAccess(address: string) {
   }
 }
 
+// Fixed function to check for analysis requests on Arbitrum
+async function checkForAnalysisRequests(address: string) {
+  if (!address) return null
+
+  try {
+    console.log(`Checking Arbitrum transactions from ${address} to ${ADMIN_WALLET_ADDRESS}`)
+
+    // Fetch transactions from user to admin
+    const response = await fetch(
+      `${ARBISCAN_API_URL}?module=account&action=txlist&address=${address}&startblock=0&endblock=99999999&sort=desc&apikey=${ARBISCAN_API_KEY}`,
+    )
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+
+    const data = await response.json()
+
+    // Handle the case where Arbiscan returns a NOTOK status
+    if (data.status !== "1") {
+      console.warn("Arbiscan API returned an error:", data.message)
+      // Return null instead of throwing an error to prevent breaking the UI
+      return null
+    }
+
+    // Filter transactions from user to admin
+    const userToAdminTxs = data.result.filter(
+      (tx: any) =>
+        tx.from.toLowerCase() === address.toLowerCase() && tx.to.toLowerCase() === ADMIN_WALLET_ADDRESS.toLowerCase(),
+    )
+
+    if (userToAdminTxs.length > 0) {
+      return {
+        found: true,
+        count: userToAdminTxs.length,
+      }
+    }
+
+    return null
+  } catch (error) {
+    console.error("Error checking for analysis requests:", error)
+    // Return null instead of throwing an error to prevent breaking the UI
+    return null
+  }
+}
+
 interface MetaMaskAuthProps {
   onConnect: (address: string) => void
   onDisconnect: () => void
@@ -197,7 +246,7 @@ export function MetaMaskAuth({ onConnect, onDisconnect }: MetaMaskAuthProps) {
     }
 
     checkConnection()
-  }, [onConnect])
+  }, [onConnect]) // Added onConnect to dependencies
 
   useEffect(() => {
     if (!window.ethereum) return
@@ -301,7 +350,7 @@ export function MetaMaskAuth({ onConnect, onDisconnect }: MetaMaskAuthProps) {
           })
         }
 
-        // For non-admin users, check for analysis requests using server action
+        // For non-admin users, check for analysis requests
         try {
           const requests = await checkForAnalysisRequests(address)
           if (requests && requests.found) {
