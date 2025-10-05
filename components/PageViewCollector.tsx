@@ -1,10 +1,10 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, Suspense } from "react"
 import { useSearchParams } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
-export function PageViewCollector() {
+function PageViewCollectorContent() {
   const [pageViews, setPageViews] = useState(0)
   const [showCounter, setShowCounter] = useState(false)
   const searchParams = useSearchParams()
@@ -33,5 +33,13 @@ export function PageViewCollector() {
         <p className="text-2xl font-bold text-white">{pageViews}</p>
       </CardContent>
     </Card>
+  )
+}
+
+export function PageViewCollector() {
+  return (
+    <Suspense fallback={null}>
+      <PageViewCollectorContent />
+    </Suspense>
   )
 }
